@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebView JS Example</title>
+  <style>
+    body { font-family: Arial; padding: 16px; background: #ffffff; }
+    h2 { margin-top: 0; }
+    .item { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; padding: 10px; border: 1px solid #eee; border-radius: 10px; }
+    .btn { padding: 6px 14px; border: none; border-radius: 16px; background: #e7f0ff; color: #1a73e8; cursor: pointer; }
+    .panel { margin-top: 16px; padding: 12px; border-top: 1px solid #eee; }
+    .total { font-size: 16px; margin: 8px 0; }
+    .bigbtn { width: 100%; padding: 10px 16px; border: none; border-radius: 10px; background: #f3f4f6; cursor: pointer; }
+  </style>
+</head>
+
+<body>
+  <div style="text-align:center; font-size:14px; color:#666;">WebView JS Example</div>
+  <h2>My Cart</h2>
+
+  <div class="item"><div>Apple - $30</div><button class="btn" onclick="addItem(30)">Add</button></div>
+  <div class="item"><div>Banana - $20</div><button class="btn" onclick="addItem(20)">Add</button></div>
+  <div class="item"><div>Orange - $25</div><button class="btn" onclick="addItem(25)">Add</button></div>
+  <div class="item"><div>Milk - $45</div><button class="btn" onclick="addItem(45)">Add</button></div>
+  <div class="item"><div>Bread - $35</div><button class="btn" onclick="addItem(35)">Add</button></div>
+
+  <div class="panel">
+    <b>Cart</b>
+    <div id="total" class="total">Total: $0</div>
+
+    <!-- Step 2: JS -> Flutter (Channel: FlutterChannel) -->
+    <button class="bigbtn" onclick="sendTotalToFlutter()">Send total to Flutter</button>
+  </div>
+
+  <script>
+    let total = 0;
+
+    function renderTotal() {
+      document.getElementById('total').innerText = 'Total: $' + total;
+    }
+
+    function addItem(price) {
+      total += price;
+      renderTotal();
+    }
+
+    // Step 2: Send data from JS to Flutter via "FlutterChannel"
+    function sendTotalToFlutter() {
+      const totalText = document.getElementById('total').innerText; // e.g. "Total: $120"
+      if (window.FlutterChannel && FlutterChannel.postMessage) {
+        FlutterChannel.postMessage(totalText);
+      } else {
+        alert('FlutterChannel not found (run inside Flutter WebView)');
+      }
+    }
+
+    // Step 3: Flutter -> JS via "updateTotalFromFlutter"
+    function updateTotalFromFlutter(newTotal) {
+      // newTotal expected number (e.g. 220)
+      total = parseInt(newTotal, 10) || 0;
+      renderTotal();
+      return 'Updated total to: $' + total;
+    }
+
+    renderTotal();
+  </script>
+</body>
+</html>
